@@ -54,7 +54,7 @@ public class BuildingController {
     public ModelAndView buildingEdit(@PathVariable("id") Long id, HttpServletRequest request){
         ModelAndView mav = new ModelAndView("admin/building/edit");
         BuildingDTO buildingDTO = buildingService.findByIdOfUpdate(id);
-        mav.addObject("buildingEdit", buildingDTO);
+        mav.addObject("buildingEdit", buildingDTO  );
         mav.addObject("districtCodes", DistrictCode.districtCodes());
         mav.addObject("typeCodes", BuildingType.type());
         return mav;
