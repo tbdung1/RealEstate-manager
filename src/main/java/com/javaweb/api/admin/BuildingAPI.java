@@ -15,13 +15,13 @@ public class BuildingAPI {
     @Autowired
     BuildingService buildingService;
     @PostMapping
-    public BuildingDTO addOrUpdateBuilding(@RequestBody BuildingDTO buildingDTO){
-        return buildingDTO;
+    public void addOrUpdateBuilding(@RequestBody BuildingDTO buildingDTO){
+        buildingService.addOrUpdateBuilding(buildingDTO);
     }
 
     @DeleteMapping("/{ids}")
     public void deleteBuilding(@PathVariable List<Long> ids){
-        System.out.println("ok");
+        buildingService.deleteBuilding(ids);
     }
 
     @GetMapping("/{id}/staffs")

@@ -15,8 +15,15 @@ public class BuildingEntity {
 //    private List<RentAreaEntity> items = new ArrayList<>();
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "buildingEntity")
-    List<AssignmentBuildingEntity> assignmentBuildingEntityEntities = new ArrayList<>();
+    List<AssignmentBuildingEntity> assignmentBuildingEntities = new ArrayList<>();
 
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "buildingEntity")
+    List<RentAreaEntity> rentAreaEntities = new ArrayList<>();
+
+    @Column(name = "district")
+    private  String district;
+    @Column(name = "type")
+    private String type;
     @Column(name = "name", nullable = false)
     private String name;
 
@@ -83,9 +90,6 @@ public class BuildingEntity {
     @Column(name = "decorationtime")
     private String decorationTime;
 
-    @Column(name = "type")
-    private String type;
-
     @Column(name = "note")
     private String note;
 
@@ -98,15 +102,21 @@ public class BuildingEntity {
     @Column(name = "brokeragefee")
     private Integer brokerageFee;
 
-//
-//    public List<RentAreaEntity> getItems() {
-//        return items;
-//    }
-//
-//    public void setItems(ArrayList<RentAreaEntity> items) {
-//        this.items = items;
-//    }
+    public List<RentAreaEntity> getRentAreaEntities() {
+        return rentAreaEntities;
+    }
 
+    public void setRentAreaEntities(List<RentAreaEntity> rentAreaEntities) {
+        this.rentAreaEntities = rentAreaEntities;
+    }
+
+    public String getDistrict() {
+        return district;
+    }
+
+    public void setDistrict(String district) {
+        this.district = district;
+    }
 
     public Long getId() {
         return id;
@@ -332,11 +342,11 @@ public class BuildingEntity {
         this.brokerageFee = brokerageFee;
     }
 
-    public List<AssignmentBuildingEntity> getAssignmentBuildingEntityEntities() {
-        return assignmentBuildingEntityEntities;
+    public List<AssignmentBuildingEntity> getAssignmentBuildingEntities() {
+        return assignmentBuildingEntities;
     }
 
-    public void setAssignmentBuildingEntityEntities(List<AssignmentBuildingEntity> assignmentBuildingEntityEntities) {
-        this.assignmentBuildingEntityEntities = assignmentBuildingEntityEntities;
+    public void setAssignmentBuildingEntities(List<AssignmentBuildingEntity> assignmentBuildingEntities) {
+        this.assignmentBuildingEntities = assignmentBuildingEntities;
     }
 }

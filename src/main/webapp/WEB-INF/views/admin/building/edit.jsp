@@ -270,11 +270,11 @@
             url: "${buildingAPI}",
             data: JSON.stringify(data),
             contentType: "application/json",
-            success: function(respond){
+            success: function(response){
                 console.log("OK");
                 window.location.href="<c:url value="/admin/building-list?message=success"/>"
             },
-            error: function(respond){
+            error: function(response){
                 console.log("failed");
             }
         });
