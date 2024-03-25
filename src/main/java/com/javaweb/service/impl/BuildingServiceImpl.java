@@ -6,6 +6,7 @@ import com.javaweb.entity.BuildingEntity;
 import com.javaweb.entity.RentAreaEntity;
 import com.javaweb.entity.UserEntity;
 import com.javaweb.model.dto.BuildingDTO;
+import com.javaweb.model.dto.UserDTO;
 import com.javaweb.model.request.BuildingSearchRequest;
 import com.javaweb.model.response.BuildingSearchResponse;
 import com.javaweb.model.response.ResponseDTO;
@@ -17,6 +18,8 @@ import com.javaweb.repository.UserRepository;
 import com.javaweb.service.BuildingService;
 import com.javaweb.utils.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -120,4 +123,39 @@ public class BuildingServiceImpl implements BuildingService {
         }
         return buildingDTO;
     }
+
+    @Override
+    public List<BuildingDTO> getBuildings(String searchValue, Pageable pageable) {
+        Page<BuildingEntity> buildings = null;
+        if (org.apache.commons.lang.StringUtils.isNotBlank(searchValue)) {
+            buildings = buildingRepository.findByNameContainingIgnoreCase(searchValue, pageable);
+        } else {
+            buildings = buildingRepository.findAll(pageable);
+        }
+        List<BuildingEntity> newsEntities = buildings.getContent();
+        List<BuildingDTO> result = new ArrayList<>();
+        for (BuildingEntity buildingEntity : newsEntities) {
+            BuildingDTO buildingDTO = buildingConverter.convertToDto(buildingEntity);
+            result.add(buildingDTO);
+        }
+        return result;
+    }
+
+    @Override
+    public List<BuildingDTO> getAllBuildings(Pageable pageable) {
+        List<BuildingEntity> buildingEntities = buildingRepository.getAllBuildings(pageable);
+        List<BuildingDTO> results = new ArrayList<>();
+        for (BuildingEntity buildingEntity : buildingEntities) {
+            BuildingDTO buildingDTO = buildingConverter.convertToDto(buildingEntity);
+            results.add(buildingDTO);
+        }
+        return results;
+    }
+
+    @Override
+    public int countTotalItems() {
+        return buildingRepository.countTotalItem();
+    }
+
+
 }

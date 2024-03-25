@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
          pageEncoding="UTF-8" %>
 <%@include file="/common/taglib.jsp" %>
+<%@ taglib prefix="display" uri="http://displaytag.sf.net"%>
 <c:url var="buildingListURL" value="/admin/building-list"/>
 <c:url var="buildingAPI" value="/api/building"/>
 <html>
@@ -223,76 +224,123 @@
             </div>
 
             <!--Bảng tòa nhà-->
-            <div class = "row">
+<%--            <div class = "row">--%>
+<%--                <div class="col-xs-12">--%>
+<%--                    <table id="tableList" style = "margin: 3em 0 1.5em;" class="table table-striped table-bordered table-hover">--%>
+<%--                        <thead>--%>
+<%--                        <tr>--%>
+<%--                            <th class="center">--%>
+<%--                                <label class="pos-rel">--%>
+<%--                                    <input type="checkbox" class="ace" name="checkList" value="">--%>
+<%--                                    <span class="lbl"></span>--%>
+<%--                                </label>--%>
+<%--                            </th>--%>
+<%--                            <th>Tên tòa nhà</th>--%>
+<%--                            <th>Địa chỉ</th>--%>
+<%--                            <th>Số tầng hầm</th>--%>
+<%--                            <th>Tên quản lý</th>--%>
+<%--                            <th>Số điện thoại quản lý</th>--%>
+<%--                            <th>DT sàn</th>--%>
+<%--                            <th>DT trống</th>--%>
+<%--                            <th>DT thuê</th>--%>
+<%--                            <th>Giá thuê</th>--%>
+<%--                            <th>Phí môi giới</th>--%>
+<%--                            <th>Phí dịch vụ</th>--%>
+<%--                            <th>Thao tác</th>--%>
+<%--                        </tr>--%>
+<%--                        </thead>--%>
+
+<%--                        <tbody>--%>
+<%--                        <c:forEach var="item" items="${buildingList}">--%>
+<%--                            <tr>--%>
+<%--                                <td class="center">--%>
+<%--                                    <label class="pos-rel">--%>
+<%--                                        <input type="checkbox" class="ace" name="checkBuilding" value="${item.id}">--%>
+<%--                                        <span class="lbl"></span>--%>
+<%--                                    </label>--%>
+<%--                                </td>--%>
+
+<%--                                <td>${item.name}</td>--%>
+<%--                                <td>${item.address}</td>--%>
+<%--                                <td>${item.numberOfBasement}</td>--%>
+<%--                                <td>${item.managerName}</td>--%>
+<%--                                <td>${item.managerPhone}</td>--%>
+<%--                                <td>${item.floorArea}</td>--%>
+<%--                                <td>${item.emptyArea}</td>--%>
+<%--                                <td>${item.rentArea}</td>--%>
+<%--                                <td>${item.rentPrice}</td>--%>
+<%--                                <td>${item.brokerageFee}</td>--%>
+<%--                                <td>${item.serviceFee}</td>--%>
+<%--                                <td>--%>
+<%--                                    <div class="hidden-sm hidden-xs btn-group">--%>
+<%--                                        <button class="btn btn-xs btn-success" title="Giao tòa nhà" onclick="assignmentBuilding(${item.id})">--%>
+<%--                                            <i class="ace-icon fa fa-check bigger-120"></i>--%>
+<%--                                        </button>--%>
+
+<%--                                        <a class="btn btn-xs btn-info", title="Sửa tòa nhà" href="/admin/building-edit-${item.id}">--%>
+<%--                                            <i class="ace-icon fa fa-pencil bigger-120"></i>--%>
+<%--                                        </a>--%>
+
+<%--                                        <button class="btn btn-xs btn-danger" title="Xóa tòa nhà" onclick="deleteBuilding(${item.id})">--%>
+<%--                                            <i class="ace-icon fa fa-trash-o bigger-120"></i>--%>
+<%--                                        </button>--%>
+<%--                                    </div>--%>
+<%--                                </td>--%>
+<%--                            </tr>--%>
+<%--                        </c:forEach>--%>
+
+<%--                        </tbody>--%>
+<%--                    </table>--%>
+<%--                </div>--%>
+<%--            </div>--%>
+
+            <div class="row">
                 <div class="col-xs-12">
-                    <table id="tableList" style = "margin: 3em 0 1.5em;" class="table table-striped table-bordered table-hover">
-                        <thead>
-                        <tr>
-                            <th class="center">
-                                <label class="pos-rel">
-                                    <input type="checkbox" class="ace" name="checkList" value="">
-                                    <span class="lbl"></span>
-                                </label>
-                            </th>
-                            <th>Tên tòa nhà</th>
-                            <th>Địa chỉ</th>
-                            <th>Số tầng hầm</th>
-                            <th>Tên quản lý</th>
-                            <th>Số điện thoại quản lý</th>
-                            <th>DT sàn</th>
-                            <th>DT trống</th>
-                            <th>DT thuê</th>
-                            <th>Giá thuê</th>
-                            <th>Phí môi giới</th>
-                            <th>Phí dịch vụ</th>
-                            <th>Thao tác</th>
-                        </tr>
-                        </thead>
+                    <div class="table-responsive">
+                        <display:table name="buildingList" cellspacing="0" cellpadding="0"
+                                       requestURI="${buildingListURL}" partialList="true" sort="external"
+                                       size="${model.totalItems}" defaultsort="2" defaultorder="ascending"
+                                       id="tableList" pagesize="${model.maxPageItems}"
+                                       export="false"
+                                       class="table table-fcv-ace table-striped table-bordered table-hover dataTable no-footer"
+                                       style="margin: 3em 0 1.5em;">
+                            <display:column title="<fieldset class='form-group'>
+												        <input type='checkbox' id='checkAll' class='check-box-element'>
+												        </fieldset>" class="center select-cell"
+                                            headerClass="center select-cell">
+                                <fieldset>
+                                    <input type="checkbox" name="checkList" value="${tableList.id}"
+                                           id="checkbox_${tableList.id}" class="check-box-element"/>
+                                </fieldset>
+                            </display:column>
+                            <display:column property="name" title="Tên tòa nhà" headerClass="center"/>
+                            <display:column property="address" title="Địa chỉ" headerClass="center"/>
+                            <display:column property="numberOfBasement" title="Số tầng hầm" headerClass="center"/>
+                            <display:column property="managerName" title="Tên quản lý" headerClass="center"/>
+                            <display:column property="managerPhone" title="Số điện thoại" headerClass="center"/>
+                            <display:column property="floorArea" title="Diện tích sàn" headerClass="center"/>
+                            <display:column property="emptyArea" title="Diện tích trống" headerClass="center"/>
+                            <display:column property="rentArea" title="Diện tích thuê" headerClass="center"/>
+                            <display:column property="brokerageFee" title="Phí môi giới" headerClass="center"/>
+                            <display:column headerClass="col-actions" title="Thao tác">
+                                <div class="hidden-sm hidden-xs btn-group">
+                                    <button class="btn btn-xs btn-success" title="Giao tòa nhà" onclick="assignmentBuilding(${tableList.id})">
+                                        <i class="ace-icon fa fa-check bigger-120"></i>
+                                    </button>
 
-                        <tbody>
-                        <c:forEach var="item" items="${buildingList}">
-                            <tr>
-                                <td class="center">
-                                    <label class="pos-rel">
-                                        <input type="checkbox" class="ace" name="checkBuilding" value="${item.id}">
-                                        <span class="lbl"></span>
-                                    </label>
-                                </td>
+                                    <a class="btn btn-xs btn-info", title="Sửa tòa nhà" href="/admin/building-edit-${tableList.id}">
+                                        <i class="ace-icon fa fa-pencil bigger-120"></i>
+                                    </a>
 
-                                <td>${item.name}</td>
-                                <td>${item.address}</td>
-                                <td>${item.numberOfBasement}</td>
-                                <td>${item.managerName}</td>
-                                <td>${item.managerPhone}</td>
-                                <td>${item.floorArea}</td>
-                                <td>${item.emptyArea}</td>
-                                <td>${item.rentArea}</td>
-                                <td>${item.rentPrice}</td>
-                                <td>${item.brokerageFee}</td>
-                                <td>${item.serviceFee}</td>
-                                <td>
-                                    <div class="hidden-sm hidden-xs btn-group">
-                                        <button class="btn btn-xs btn-success" title="Giao tòa nhà" onclick="assignmentBuilding(${item.id})">
-                                            <i class="ace-icon fa fa-check bigger-120"></i>
-                                        </button>
-
-                                        <a class="btn btn-xs btn-info", title="Sửa tòa nhà" href="/admin/building-edit-${item.id}">
-                                            <i class="ace-icon fa fa-pencil bigger-120"></i>
-                                        </a>
-
-                                        <button class="btn btn-xs btn-danger" title="Xóa tòa nhà" onclick="deleteBuilding(${item.id})">
-                                            <i class="ace-icon fa fa-trash-o bigger-120"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                        </c:forEach>
-
-                        </tbody>
-                    </table>
+                                    <button class="btn btn-xs btn-danger" title="Xóa tòa nhà" onclick="deleteBuilding(${tableList.id})">
+                                        <i class="ace-icon fa fa-trash-o bigger-120"></i>
+                                    </button>
+                                </div>
+                            </display:column>
+                        </display:table>
+                    </div>
                 </div>
             </div>
-
         </div><!-- /.page-content -->
     </div>
 </div><!-- /.main-content -->
