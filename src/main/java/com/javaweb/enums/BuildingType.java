@@ -4,9 +4,9 @@ package com.javaweb.enums;
 import java.util.*;
 
 public enum BuildingType {
-    TANG_TRET ("Tầng Trệt "),
-    NGUYEN_CAN ("Nguyên Căn "),
-    NOI_THAT ("Nội Thất ");
+    TANG_TRET ("Tầng Trệt"),
+    NGUYEN_CAN ("Nguyên Căn"),
+    NOI_THAT ("Nội Thất");
 
     private final String name;
 

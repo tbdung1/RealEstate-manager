@@ -2,7 +2,6 @@ package com.javaweb.repository.custom.impl;
 
 import com.javaweb.entity.BuildingEntity;
 import com.javaweb.entity.UserEntity;
-import com.javaweb.model.dto.BuildingDTO;
 import com.javaweb.model.request.BuildingSearchRequest;
 import com.javaweb.repository.custom.BuildingRepositoryCustom;
 import org.springframework.data.domain.Pageable;
@@ -19,7 +18,7 @@ public class BuildingRepositoryImpl implements BuildingRepositoryCustom {
     @PersistenceContext
     private EntityManager entityManager;
 
-    public static void setJoin(BuildingSearchRequest buildingSearchRequest, StringBuilder sql) {
+    public void setJoin(BuildingSearchRequest buildingSearchRequest, StringBuilder sql) {
         // TODO Auto-generated method stub
         Long areaFrom = buildingSearchRequest.getAreaFrom();
         Long areaTo = buildingSearchRequest.getAreaTo();
@@ -81,7 +80,7 @@ public class BuildingRepositoryImpl implements BuildingRepositoryCustom {
         }
         List<String> typeCode = buildingSearchRequest.getTypeCode();
         if(typeCode != null && typeCode.size() != 0) {
-            where.append("AND b.type IN (");
+            where.append("AND b.type LIKE '%");
 //			for(String x : listRentType) {
 //				where.append("'" + x + "',");
 //			}
@@ -91,46 +90,37 @@ public class BuildingRepositoryImpl implements BuildingRepositoryCustom {
             //where.append("('" + String.join("', '", listRentType) + "') ");
 
             //java 8
-            String where_tmp = typeCode.stream().map(it -> "'" + it + "'").collect(Collectors.joining(","));
+            String where_tmp = typeCode.stream().map(it -> it).collect(Collectors.joining(","));
             where.append(where_tmp);
-            where.append(") ");
+            where.append("%' ");
         }
 
     }
     @Override
-    public List<BuildingEntity> findAllBuilding(BuildingSearchRequest buildingSearchRequest) {
-        StringBuilder sql = new StringBuilder("SELECT b.* FROM building b\n");
+    public List<BuildingEntity> findAllBuilding(BuildingSearchRequest buildingSearchRequest, Pageable pageable) {
+        StringBuilder sql = new StringBuilder(buildQueryFilter(buildingSearchRequest))
+                .append(" LIMIT ").append(pageable.getPageSize()).append("\n")
+                .append(" OFFSET ").append(pageable.getOffset());
+        Query query = entityManager.createNativeQuery(sql.toString(), BuildingEntity.class);
+        return query.getResultList();
+    }
+
+
+    @Override
+    public int countTotalItem(BuildingSearchRequest buildingSearchRequest) {
+        String sql = buildQueryFilter(buildingSearchRequest);
+        Query query = entityManager.createNativeQuery(sql);
+        return query.getResultList().size();
+    }
+
+    private String buildQueryFilter(BuildingSearchRequest buildingSearchRequest) {
+            StringBuilder sql = new StringBuilder("SELECT b.* FROM building b\n");
         setJoin(buildingSearchRequest, sql);
         StringBuilder where = new StringBuilder(" WHERE 1=1 ");
         queryNormal(buildingSearchRequest, where);
         querySpecial(buildingSearchRequest, where);
         where.append("GROUP BY b.id");
         sql.append(where);
-        Query query = entityManager.createNativeQuery(sql.toString(), BuildingEntity.class);
-        return query.getResultList();
-    }
-
-    @Override
-    public List<BuildingEntity> getAllBuildings(Pageable pageable) {
-
-        StringBuilder sql = new StringBuilder(buildQueryFilter())
-                .append(" LIMIT ").append(pageable.getPageSize()).append("\n")
-                .append(" OFFSET ").append(pageable.getOffset());
-        System.out.println("Final query: " + sql.toString());
-
-        Query query = entityManager.createNativeQuery(sql.toString(), UserEntity.class);
-        return query.getResultList();
-    }
-
-    @Override
-    public int countTotalItem() {
-        String sql = buildQueryFilter();
-        Query query = entityManager.createNativeQuery(sql.toString());
-        return query.getResultList().size();
-    }
-
-    private String buildQueryFilter() {
-        String sql = "SELECT * FROM building";
-        return sql;
+        return sql.toString();
     }
 }

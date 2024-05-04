@@ -208,6 +208,23 @@
                                         <form:input class="form-control" path="note"/>
                                     </div>
                                 </di>
+                                <div class="form-group">
+                                    <label class="col-xs-3">Ảnh tòa nhà</label>
+                                    <div class="col-sm-9">
+                                        <c:if test="${not empty buildingEdit.image}">
+                                            <c:set var="imagePath" value="/repository${buildingEdit.image}"/>
+                                            <img src="${imagePath}" id="viewImage" width="300px" height="300px" style="margin-top: 50px">
+                                        </c:if>
+                                        <c:if test="${empty buildingEdit.image}">
+                                            <img src="/admin/image/default.png" id="viewImage" width="300px" height="300px">
+                                        </c:if>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-sm-3"> </div>
+                                    <input class="col-sm-9 no-padding-right" type="file" id="uploadImage"/>
+                                </div>
+
                                 <di class="form-group">
                                     <label class="col-xs-3"></label>
                                     <div class="col-xs-9">
@@ -219,6 +236,7 @@
                                             <button type="button" class="btn btn-success" id="btnAddOrUpdateBuilding">Thêm tòa nhà</button>
                                             <button type="button" class="btn btn-success" id="btnCancel">Hủy thao tác</button>
                                         </c:if>
+                                        <img src="/img/loading.gif" style="display: none; height: 100px" id="loading_image">
                                     </div>
                                 </di>
                                 <form:hidden path="id" id="buildingId" />
@@ -238,22 +256,30 @@
 </div><!-- /.main-container -->
 
 <script>
+    var imageBase64 = '';
+    var imageName = '';
+
     $('#btnAddOrUpdateBuilding').click(function(){
         var data = {};
         var typeCode = [];
         var formData = $('#listForm').serializeArray();
         $.each(formData, function(i, v){
             if(v.name != 'typeCode')
-                data[v.name] = v.value;
+                data['' + v.name + ''] = v.value;
             else
                 typeCode.push(v.value);
+            if ('' !== imageBase64) {
+                data['imageBase64'] = imageBase64;
+                data['imageName'] = imageName;
+            }
         });
-        data["typeCode"] = typeCode;
-        if(typeCode.length != 0 && data["name"] != ""){
+        $('#loading_image').show();
+        data['typeCode'] = typeCode;
+        if(typeCode.length != 0 && data['name'] != ""){
             addOrUpdateBuilding(data);
         }
         else{
-            if(data["name"] == "" && typeCode.length == 0){
+            if(data['name'] == "" && typeCode.length == 0){
                 window.location.href="<c:url value="/admin/building-edit?typeCode=required&name=required"/>"
             }
             else if (typeCode.length == 0){
@@ -271,17 +297,37 @@
             data: JSON.stringify(data),
             contentType: "application/json",
             success: function(response){
-                console.log("OK");
                 window.location.href="<c:url value="/admin/building-list?message=success"/>"
             },
             error: function(response){
-                console.log("failed");
+                window.location.href="<c:url value="/admin/building-list?message=error"/>"
             }
         });
     }
     $('#btnCancel').click(function (){
         window.location.href="/admin/building-list"
     })
+    $('#uploadImage').change(function (event) {
+        var reader = new FileReader();
+        var file = $(this)[0].files[0];
+        reader.onload = function(e){
+            imageBase64 = e.target.result;
+            imageName = file.name; // ten hinh khong dau, khoang cach. Dat theo format sau: a-b-c
+        };
+        reader.readAsDataURL(file);
+        openImage(this, "viewImage");
+    });
+
+
+    function openImage(input, imageView) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                $('#' +imageView).attr('src', reader.result);
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
 </script>
 </body>
 </html>

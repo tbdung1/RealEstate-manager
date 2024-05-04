@@ -11,13 +11,14 @@ public class BuildingEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-//    @OneToMany(mappedBy = "building", fetch = FetchType.LAZY)
-//    private List<RentAreaEntity> items = new ArrayList<>();
-
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "buildingEntity")
-    List<AssignmentBuildingEntity> assignmentBuildingEntities = new ArrayList<>();
-
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "buildingEntity")
+//    @OneToMany(fetch = FetchType.LAZY, mappedBy = "buildingEntity")
+//    List<AssignmentBuildingEntity> assignmentBuildingEntities = new ArrayList<>();
+    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST,CascadeType.MERGE})
+    @JoinTable(name = "assignmentbuilding",
+        joinColumns = @JoinColumn(name = "buildingid", nullable = false),
+        inverseJoinColumns = @JoinColumn(name = "staffid", nullable = false))
+    private List<UserEntity> users = new ArrayList<>();
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "buildingEntity", cascade = {CascadeType.PERSIST,CascadeType.MERGE}, orphanRemoval = true)
     List<RentAreaEntity> rentAreaEntities = new ArrayList<>();
 
     @Column(name = "district")
@@ -101,6 +102,17 @@ public class BuildingEntity {
 
     @Column(name = "brokeragefee")
     private Integer brokerageFee;
+
+    @Column(name = "image")
+    private String image;
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
 
     public List<RentAreaEntity> getRentAreaEntities() {
         return rentAreaEntities;
@@ -342,11 +354,11 @@ public class BuildingEntity {
         this.brokerageFee = brokerageFee;
     }
 
-    public List<AssignmentBuildingEntity> getAssignmentBuildingEntities() {
-        return assignmentBuildingEntities;
+    public List<UserEntity> getUsers() {
+        return users;
     }
 
-    public void setAssignmentBuildingEntities(List<AssignmentBuildingEntity> assignmentBuildingEntities) {
-        this.assignmentBuildingEntities = assignmentBuildingEntities;
+    public void setUsers(List<UserEntity> users) {
+        this.users = users;
     }
 }

@@ -14,8 +14,13 @@ public class UserEntity extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "userEntity")
-    List<AssignmentBuildingEntity> assignmentBuildingEntityEntities = new ArrayList<>();
+//    @OneToMany(fetch = FetchType.LAZY, mappedBy = "userEntity")
+//    List<AssignmentBuildingEntity> assignmentBuildingEntityEntities = new ArrayList<>();
+
+    @ManyToMany(mappedBy = "users", fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST,CascadeType.MERGE})
+    private List<BuildingEntity> buildingEntities = new ArrayList<>();
+    @ManyToMany(mappedBy = "users", fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST,CascadeType.MERGE})
+    private List<CustomerEntity> customerEntities = new ArrayList<>();
 
     @Column(name = "username", nullable = false, unique = true)
     private String userName;
@@ -45,16 +50,25 @@ public class UserEntity extends BaseEntity {
 //    @OneToMany(mappedBy="users", fetch = FetchType.LAZY)
 //    private List<UserRoleEntity> userRoleEntities = new ArrayList<>();
 
+
+    public List<BuildingEntity> getBuildingEntities() {
+        return buildingEntities;
+    }
+
+    public void setBuildingEntities(List<BuildingEntity> buildingEntities) {
+        this.buildingEntities = buildingEntities;
+    }
+
+    public List<CustomerEntity> getCustomerEntities() {
+        return customerEntities;
+    }
+
+    public void setCustomerEntities(List<CustomerEntity> customerEntities) {
+        this.customerEntities = customerEntities;
+    }
+
     public static long getSerialVersionUID() {
         return serialVersionUID;
-    }
-
-    public List<AssignmentBuildingEntity> getAssignmentBuildingEntityEntities() {
-        return assignmentBuildingEntityEntities;
-    }
-
-    public void setAssignmentBuildingEntityEntities(List<AssignmentBuildingEntity> assignmentBuildingEntityEntities) {
-        this.assignmentBuildingEntityEntities = assignmentBuildingEntityEntities;
     }
 
     public String getUserName() {

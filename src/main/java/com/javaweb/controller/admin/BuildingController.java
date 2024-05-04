@@ -7,7 +7,6 @@ import com.javaweb.entity.BuildingEntity;
 import com.javaweb.enums.BuildingType;
 import com.javaweb.enums.DistrictCode;
 import com.javaweb.model.dto.BuildingDTO;
-import com.javaweb.model.dto.UserDTO;
 import com.javaweb.model.request.BuildingSearchRequest;
 import com.javaweb.model.response.BuildingSearchResponse;
 import com.javaweb.service.BuildingService;
@@ -46,22 +45,19 @@ public class BuildingController {
         }
     }
     @GetMapping(value="/admin/building-list")
-    public ModelAndView buildingList(@ModelAttribute BuildingSearchRequest buildingSearchRequest, HttpServletRequest request,
-                                     @ModelAttribute(SystemConstant.MODEL) BuildingDTO model){
+    public ModelAndView buildingList(@ModelAttribute(SystemConstant.MODEL) BuildingSearchRequest buildingSearchRequest, HttpServletRequest request){
         ModelAndView mav = new ModelAndView("admin/building/list");
         mav.addObject("modelSearch", buildingSearchRequest);
 
         List<BuildingSearchResponse> reponseList = new ArrayList<>();
-        reponseList = buildingService.findAll(buildingSearchRequest);
-
-        DisplayTagUtils.of(request, model);
-        List<BuildingDTO> news = buildingService.getBuildings(model.getSearchValue(), PageRequest.of(model.getPage() - 1, model.getMaxPageItems()));
-        model.setListResult(news);
-        model.setTotalItems(buildingService.countTotalItems());
-        mav.addObject(SystemConstant.MODEL, model);
+        DisplayTagUtils.of(request, buildingSearchRequest);
+        reponseList = buildingService.findAll(buildingSearchRequest, PageRequest.of(buildingSearchRequest.getPage() - 1, buildingSearchRequest.getMaxPageItems()));
+        BuildingSearchResponse buildingSearchResponse = new BuildingSearchResponse();
+        buildingSearchResponse.setListResult(reponseList);
+        buildingSearchResponse.setTotalItems(buildingService.countTotalItems(buildingSearchRequest));
+//        mav.addObject(SystemConstant.MODEL, buildingSearchResponse);
         initMessageResponse(mav, request);
-
-        mav.addObject("buildingList",reponseList);
+        mav.addObject("buildingList",buildingSearchResponse);
         mav.addObject("listStaffs", userService.getStaffs());
         mav.addObject("districtCodes", DistrictCode.districtCodes());
         mav.addObject("typeCodes", BuildingType.type());
@@ -79,7 +75,7 @@ public class BuildingController {
     public ModelAndView buildingEdit(@PathVariable("id") Long id, HttpServletRequest request){
         ModelAndView mav = new ModelAndView("admin/building/edit");
         BuildingDTO buildingDTO = buildingService.findByIdOfUpdate(id);
-        mav.addObject("buildingEdit", buildingDTO  );
+        mav.addObject("buildingEdit", buildingDTO);
         mav.addObject("districtCodes", DistrictCode.districtCodes());
         mav.addObject("typeCodes", BuildingType.type());
         return mav;

@@ -297,10 +297,10 @@
             <div class="row">
                 <div class="col-xs-12">
                     <div class="table-responsive">
-                        <display:table name="buildingList" cellspacing="0" cellpadding="0"
+                        <display:table name="buildingList.listResult" cellspacing="0" cellpadding="0"
                                        requestURI="${buildingListURL}" partialList="true" sort="external"
-                                       size="${model.totalItems}" defaultsort="2" defaultorder="ascending"
-                                       id="tableList" pagesize="${model.maxPageItems}"
+                                       size="${buildingList.totalItems}" defaultsort="2" defaultorder="ascending"
+                                       id="tableList" pagesize="${buildingList.maxPageItems}"
                                        export="false"
                                        class="table table-fcv-ace table-striped table-bordered table-hover dataTable no-footer"
                                        style="margin: 3em 0 1.5em;">
@@ -341,6 +341,7 @@
                     </div>
                 </div>
             </div>
+
         </div><!-- /.page-content -->
     </div>
 </div><!-- /.main-content -->

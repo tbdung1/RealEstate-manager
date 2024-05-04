@@ -1,12 +1,10 @@
 package com.javaweb.service.impl;
 
+import com.javaweb.converter.AssignmentBuildingConverter;
 import com.javaweb.converter.BuildingConverter;
-import com.javaweb.entity.AssignmentBuildingEntity;
-import com.javaweb.entity.BuildingEntity;
-import com.javaweb.entity.RentAreaEntity;
-import com.javaweb.entity.UserEntity;
+import com.javaweb.entity.*;
+import com.javaweb.model.dto.AssignmentBuildingDTO;
 import com.javaweb.model.dto.BuildingDTO;
-import com.javaweb.model.dto.UserDTO;
 import com.javaweb.model.request.BuildingSearchRequest;
 import com.javaweb.model.response.BuildingSearchResponse;
 import com.javaweb.model.response.ResponseDTO;
@@ -17,17 +15,27 @@ import com.javaweb.repository.RentAreaRepository;
 import com.javaweb.repository.UserRepository;
 import com.javaweb.service.BuildingService;
 import com.javaweb.utils.StringUtils;
+import com.javaweb.utils.UploadFileUtils;
+import org.apache.tomcat.util.codec.binary.Base64;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.acls.model.NotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional
 public class BuildingServiceImpl implements BuildingService {
+    @Autowired
+    ModelMapper modelMapper;
     @Autowired
     BuildingRepository buildingRepository;
     @Autowired
@@ -37,18 +45,28 @@ public class BuildingServiceImpl implements BuildingService {
     @Autowired
     RentAreaRepository rentAreaRepository;
     @Autowired
-    AssignmentBuildingRepository assignmentBuildingRepository;
+    UploadFileUtils uploadFileUtils;
+    private void saveThumbnail(BuildingDTO buildingDTO, BuildingEntity buildingEntity) {
+        String path = "/building/" + buildingDTO.getImageName();
+        if (null != buildingDTO.getImageBase64()) {
+            if (null != buildingEntity.getImage()) {
+                if (!path.equals(buildingEntity.getImage())) {
+                    File file = new File("C://home/office" + buildingEntity.getImage());
+                    file.delete();
+                }
+            }
+            byte[] bytes = Base64.decodeBase64(buildingDTO.getImageBase64().getBytes());
+            uploadFileUtils.writeOrUpdate(path, bytes);
+            buildingEntity.setImage(path);
+        }
+    }
     @Override
     public ResponseDTO listStaffs(Long buildingId) {
         ResponseDTO responseDTO = new ResponseDTO();
         BuildingEntity buildingEntity = buildingRepository.findById(buildingId).get();
         List<UserEntity> staffs = userRepository.findByStatusAndRoles_Code(1, "STAFF");
-        List<UserEntity> staffAssignments = new ArrayList<>();
-        List<AssignmentBuildingEntity> assignmentBuildingEntities = buildingEntity.getAssignmentBuildingEntities();
-        for(AssignmentBuildingEntity item : assignmentBuildingEntities){
-            UserEntity userEntity = item.getUserEntity();
-            if(staffAssignments.contains(userEntity) == false) staffAssignments.add(userEntity);
-        }
+        List<UserEntity> staffAssignments = buildingEntity.getUsers();
+
         List<StaffResponseDTO> staffResponseDTOS = new ArrayList<>();
         for(UserEntity it: staffs){
             StaffResponseDTO staffResponseDTO = new StaffResponseDTO();
@@ -63,53 +81,65 @@ public class BuildingServiceImpl implements BuildingService {
         return responseDTO;
     }
 
+//    @Override
+//    public List<BuildingDTO> getBuildings(String searchValue, Pageable pageable) {
+//        Page<BuildingEntity> buildings = null;
+//        if (org.apache.commons.lang.StringUtils.isNotBlank(searchValue)) {
+//            buildings = buildingRepository.findByNameContainingIgnoreCase(searchValue, pageable);
+//        } else {
+//            buildings = buildingRepository.findAll(pageable);
+//        }
+//        List<BuildingEntity> newsEntities = buildings.getContent();
+//        List<BuildingDTO> result = new ArrayList<>();
+//        for (BuildingEntity buildingEntity : newsEntities) {
+//            BuildingDTO buildingDTO = buildingConverter.convertToDto(buildingEntity);
+//            result.add(buildingDTO);
+//        }
+//        return result;
+//    }
+
     @Override
-    public List<BuildingSearchResponse> findAll(BuildingSearchRequest buildingSearchRequest) {
+    public List<BuildingSearchResponse> findAll(BuildingSearchRequest buildingSearchRequest, Pageable pageable) {
         List<BuildingSearchResponse> buildingSearchResponses = new ArrayList<>();
-        List<BuildingEntity> buildingEntities = buildingRepository.findAllBuilding(buildingSearchRequest);
+        List<BuildingEntity> buildingEntities = buildingRepository.findAllBuilding(buildingSearchRequest, pageable);
         for (BuildingEntity x : buildingEntities){
             BuildingSearchResponse buildingSearchResponse = new BuildingSearchResponse();
             buildingSearchResponse = buildingConverter.convertToResponse(x);
             buildingSearchResponses.add(buildingSearchResponse);
         }
-        return buildingSearchResponses;
+        return  buildingSearchResponses;
     }
 
     @Override
     public void addOrUpdateBuilding(BuildingDTO buildingDTO) {
-        BuildingEntity buildingEntity = buildingConverter.convertToEntity(buildingDTO);
-        List<AssignmentBuildingEntity> assignmentBuildingEntities = buildingEntity.getAssignmentBuildingEntities();
+        BuildingEntity buildingEntity = new BuildingEntity();
         if(buildingDTO.getId() != null) {
-            List<Long> ids = new ArrayList<>();
-            ids.add(buildingDTO.getId());
-            deleteBuilding(ids);
+            buildingEntity = buildingRepository.findById(buildingDTO.getId()).get();
+//            List<RentAreaEntity> rentAreaEntities = buildingEntity.getRentAreaEntities();
+//            rentAreaRepository.deleteInBatch(rentAreaEntities);
         }
-        String tmp = buildingDTO.getRentArea();
-        String[] listRentArea = tmp.split(",\\s*");
+        buildingEntity = buildingConverter.convertToEntity(buildingDTO);
+        saveThumbnail(buildingDTO, buildingEntity);
         List<RentAreaEntity> rentAreaEntities = new ArrayList<>();
+        String[] listRentArea = buildingDTO.getRentArea().split(",\\s*");
         if(StringUtils.check(listRentArea[0])){
             for(String it: listRentArea){
                 RentAreaEntity rentAreaEntity = new RentAreaEntity();
-                rentAreaEntity.setBuildingEntity(buildingEntity);
                 rentAreaEntity.setValue(Long.parseLong(it));
                 rentAreaEntities.add(rentAreaEntity);
             }
+            buildingEntity.setRentAreaEntities(rentAreaEntities);
         }
         buildingRepository.save(buildingEntity);
-        if(rentAreaEntities != null) rentAreaRepository.saveAll(rentAreaEntities);
-        if(assignmentBuildingEntities != null) assignmentBuildingRepository.saveAll(assignmentBuildingEntities);
     }
 
     @Override
     public void deleteBuilding(List<Long> ids) {
         List<BuildingEntity> buildingEntities = buildingRepository.findByIdIn(ids);
-        for(BuildingEntity it : buildingEntities){
-            List<RentAreaEntity> rentAreaEntities = it.getRentAreaEntities();
-            rentAreaRepository.deleteInBatch(rentAreaEntities);
-            List<AssignmentBuildingEntity> assignmentBuildingEntities = it.getAssignmentBuildingEntities();
-            assignmentBuildingRepository.deleteInBatch(assignmentBuildingEntities);
-            buildingRepository.delete(it);
-        }
+//        for(BuildingEntity it : buildingEntities){
+//            buildingRepository.delete(it);
+//        }
+        buildingRepository.deleteInBatch(buildingEntities);
     }
 
     @Override
@@ -125,37 +155,21 @@ public class BuildingServiceImpl implements BuildingService {
     }
 
     @Override
-    public List<BuildingDTO> getBuildings(String searchValue, Pageable pageable) {
-        Page<BuildingEntity> buildings = null;
-        if (org.apache.commons.lang.StringUtils.isNotBlank(searchValue)) {
-            buildings = buildingRepository.findByNameContainingIgnoreCase(searchValue, pageable);
-        } else {
-            buildings = buildingRepository.findAll(pageable);
-        }
-        List<BuildingEntity> newsEntities = buildings.getContent();
-        List<BuildingDTO> result = new ArrayList<>();
-        for (BuildingEntity buildingEntity : newsEntities) {
-            BuildingDTO buildingDTO = buildingConverter.convertToDto(buildingEntity);
-            result.add(buildingDTO);
-        }
-        return result;
+    public void updateAssignmentBuilding(AssignmentBuildingDTO assignmentBuildingDTO) {
+        BuildingEntity buildingEntity = buildingRepository.findById(assignmentBuildingDTO.getBuildingId()).get();
+        List<UserEntity> userEntities = userRepository.findByIdIn(assignmentBuildingDTO.getStaffs());
+        buildingEntity.setUsers(userEntities);
+        buildingRepository.save(buildingEntity);
+//        List<AssignmentBuildingEntity> assignmentBuildingEntities = buildingEntity.getAssignmentBuildingEntities();
+//        assignmentBuildingRepository.deleteInBatch(assignmentBuildingEntities);
+
+//        List<AssignmentBuildingEntity> result = assignmentBuildingConverter.convertToListEntity(assignmentBuildingDTO);
+//        assignmentBuildingRepository.saveAll(result);
     }
 
     @Override
-    public List<BuildingDTO> getAllBuildings(Pageable pageable) {
-        List<BuildingEntity> buildingEntities = buildingRepository.getAllBuildings(pageable);
-        List<BuildingDTO> results = new ArrayList<>();
-        for (BuildingEntity buildingEntity : buildingEntities) {
-            BuildingDTO buildingDTO = buildingConverter.convertToDto(buildingEntity);
-            results.add(buildingDTO);
-        }
-        return results;
+    public int countTotalItems(BuildingSearchRequest buildingSearchRequest) {
+        return buildingRepository.countTotalItem(buildingSearchRequest);
     }
-
-    @Override
-    public int countTotalItems() {
-        return buildingRepository.countTotalItem();
-    }
-
 
 }
