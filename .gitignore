@@ -2,5 +2,4 @@ target
 .idea
 database
 *.iml
-*.xml
-*.gitignore
+
