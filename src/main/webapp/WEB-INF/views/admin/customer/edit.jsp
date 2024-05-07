@@ -257,23 +257,27 @@
         data['code'] = $('#code').val();
         data['transactionDetail'] = $('#transactionDetail').val();
         data['id'] = $('#id').val();
-        if(data['transactionDetail'] != '') addTransaction(data);
+        if(data['transactionDetail'] != '') addOrUpdateTransaction(data);
         else {
             window.location.href="<c:url value="/admin/customer-edit?transactionDetail=required"/>"
         }
     });
-    function addTransaction(data){
+    function addOrUpdateTransaction(data){
         $.ajax({
             type: "POST",
             url: "${customerAPI}/" + "transaction",
+            dataType: "JSON",
             data: JSON.stringify(data),
             contentType: "application/json",
             success: function(response){
-                alert("Đã thêm giao dịch!");
-                <%--window.location.href="<c:url value="/admin/customer-list?message=success"/>"--%>
+                var url = '/admin/customer-edit-' + response + '?message=success';
+                // Chuyển hướng trình duyệt đến URL mới
+                window.location.href = url;
             },
             error: function(response){
-                window.location.href="<c:url value="/admin/customer-list?message=error"/>"
+                var url = '/admin/customer-edit-' + response + '?message=error';
+                // Chuyển hướng trình duyệt đến URL mới
+                window.location.href = url;
             }
         });
     }
@@ -283,15 +287,15 @@
         $.each(formData, function(i, v){
                 data['' + v.name + ''] = v.value;
         });
-        if(data['name'] != ""){
+        if(data['name'] != "" && data['customerPhone']){
             addOrUpdateCustomer(data);
         }
         else{
-            if(data['name'] == "" && data['status'] == ""){
-                window.location.href="<c:url value="/admin/customer-edit?status=required&name=required"/>"
+            if(data['name'] == "" && data['customerPhone'] == ""){
+                window.location.href="<c:url value="/admin/customer-edit?customerPhone=required&name=required"/>"
             }
-            else if (data['status'] == ""){
-                window.location.href="<c:url value="/admin/customer-edit?status=required"/>"
+            else if (data['customerPhone'] == ""){
+                window.location.href="<c:url value="/admin/customer-edit?customerPhone=required"/>"
             }
             else{
                 window.location.href="<c:url value="/admin/customer-edit?name=required"/>"

@@ -4,6 +4,7 @@ import com.javaweb.converter.TransactionConverter;
 import com.javaweb.entity.CustomerEntity;
 import com.javaweb.entity.TransactionEntity;
 import com.javaweb.model.dto.TransactionDTO;
+import com.javaweb.model.response.CustomerSearchReponse;
 import com.javaweb.model.response.ResponseDTO;
 import com.javaweb.repository.CustomerRepository;
 import com.javaweb.repository.TransactionRepository;
@@ -34,10 +35,19 @@ public class TransactionServiceImpl implements ITransactionService {
                 TransactionDTO transactionDTO = transactionConverter.convertToDTO(x);
                 transactionDTOList.add(transactionDTO);
             }
+            for(TransactionDTO trans : transactionDTOList){
+                if(trans.getCreatedDate() != null && trans.getModifiedDate() != null){
+                    if(trans.getModifiedDate().equals(trans.getCreatedDate())) {
+                        trans.setModifiedDate(null);
+                        trans.setModifiedBy(null);
+                    }
+
+                }
+            }
         return transactionDTOList;
     }
 @Override
-public void addOrUpdateTransaction(TransactionDTO transactionDTO) {
+public Long addOrUpdateTransaction(TransactionDTO transactionDTO) {
     TransactionEntity transactionEntity = new TransactionEntity();
     List<TransactionEntity> transactionEntities = new ArrayList<>();
     if(transactionDTO.getId() != null){
@@ -48,6 +58,7 @@ public void addOrUpdateTransaction(TransactionDTO transactionDTO) {
     }
     transactionEntity = transactionConverter.convertToEntity(transactionDTO);
     transactionRepository.save(transactionEntity);
+    return transactionEntity.getCustomerEntity().getId();
 }
 
     @Override

@@ -9,6 +9,7 @@ import com.javaweb.enums.DistrictCode;
 import com.javaweb.model.dto.BuildingDTO;
 import com.javaweb.model.request.BuildingSearchRequest;
 import com.javaweb.model.response.BuildingSearchResponse;
+import com.javaweb.security.utils.SecurityUtils;
 import com.javaweb.service.BuildingService;
 import com.javaweb.service.impl.UserService;
 import com.javaweb.utils.DisplayTagUtils;
@@ -48,9 +49,16 @@ public class BuildingController {
     public ModelAndView buildingList(@ModelAttribute(SystemConstant.MODEL) BuildingSearchRequest buildingSearchRequest, HttpServletRequest request){
         ModelAndView mav = new ModelAndView("admin/building/list");
         mav.addObject("modelSearch", buildingSearchRequest);
-
         List<BuildingSearchResponse> reponseList = new ArrayList<>();
         DisplayTagUtils.of(request, buildingSearchRequest);
+        if(SecurityUtils.getAuthorities().contains("ROLE_STAFF")){
+            Long staffId = SecurityUtils.getPrincipal().getId();
+            buildingSearchRequest.setStaffId(staffId);
+            reponseList = buildingService.findAll(buildingSearchRequest, PageRequest.of(buildingSearchRequest.getPage() - 1, buildingSearchRequest.getMaxPageItems()));
+        }
+        else {
+            reponseList = buildingService.findAll(buildingSearchRequest, PageRequest.of(buildingSearchRequest.getPage() - 1, buildingSearchRequest.getMaxPageItems()));
+        }
         reponseList = buildingService.findAll(buildingSearchRequest, PageRequest.of(buildingSearchRequest.getPage() - 1, buildingSearchRequest.getMaxPageItems()));
         BuildingSearchResponse buildingSearchResponse = new BuildingSearchResponse();
         buildingSearchResponse.setListResult(reponseList);

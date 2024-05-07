@@ -86,7 +86,9 @@ public class CustomerServiceImpl implements ICustomerService {
     @Override
     public void deleteCustomers(List<Long> ids) {
         List<CustomerEntity> customerEntities = customerRepository.findByIdIn(ids);
-        customerRepository.deleteInBatch(customerEntities);
+        for(CustomerEntity cus : customerEntities){
+            cus.setIs_active(false);
+        }
     }
 
     @Override

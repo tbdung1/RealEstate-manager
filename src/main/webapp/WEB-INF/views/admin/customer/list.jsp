@@ -286,10 +286,10 @@
     };
     $('#btnDeleteCustomer').click(function (e){
         e.preventDefault();
-        var customerIds = $('#tableList').find('fieldset input[type = checkbox]:checked').map(function(){
+        var customerIds = $('#tableList').find('tbody input[type = checkbox]:checked').map(function(){
             return $(this).val();
         }).get();
-        deleteBuildings(customerIds);
+        deleteCustomers(customerIds);
     });
     function deleteCustomers(data){
         $.ajax({

@@ -39,8 +39,9 @@ public class CustomerAPI {
         customerService.updateAssignmentCustomer(assignmentCustomerDTO);
     }
     @PostMapping("/transaction")
-    public void addOrUpdateTransaction(@RequestBody TransactionDTO transactionDTO){
-        transactionService.addOrUpdateTransaction(transactionDTO);
+    public Long addOrUpdateTransaction(@RequestBody TransactionDTO transactionDTO){
+        Long customerId = transactionService.addOrUpdateTransaction(transactionDTO);
+        return customerId;
     }
     @DeleteMapping("/transaction/{id}")
     public void deleteTransaction(@PathVariable Long id){ transactionService.deleteTransaction(id);}

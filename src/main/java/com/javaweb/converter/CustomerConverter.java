@@ -31,6 +31,7 @@ public class CustomerConverter {
         result.setFullName(customerDTO.getName());
         result.setPhone(customerDTO.getCustomerPhone());
         result.setIs_active(true);
+        if(result.getStatus() == null) result.setStatus("Chưa xử lý");
         return result;
     }
     public CustomerDTO convertToDTO(CustomerEntity customerEntity){

@@ -9,6 +9,6 @@ import java.util.Map;
 
 public interface ITransactionService {
     public List<TransactionDTO> transactionTypeCustomer(String transactionType, Long customerid);
-    public void addOrUpdateTransaction(TransactionDTO transactionDTO);
+    public Long addOrUpdateTransaction(TransactionDTO transactionDTO);
     public void deleteTransaction(Long id);
 }
