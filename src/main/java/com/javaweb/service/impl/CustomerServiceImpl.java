@@ -109,10 +109,8 @@ public class CustomerServiceImpl implements ICustomerService {
             customerDTO.setCreatedBy(customerEntity.getCreatedBy());
             customerDTO.setCreatedDate(customerEntity.getCreatedDate());
         }
-        List<TransactionEntity> transactionEntities = customerEntity.getTransactionEntities();
         List<UserEntity> userEntities = customerEntity.getUsers();
         customerEntity = customerConverter.convertToEntity(customerDTO);
-        if(transactionEntities != null) customerEntity.setTransactionEntities(transactionEntities);
         if(userEntities != null) customerEntity.setUsers(userEntities);
         customerRepository.save(customerEntity);
     }

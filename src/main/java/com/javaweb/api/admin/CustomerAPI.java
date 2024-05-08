@@ -25,6 +25,10 @@ public class CustomerAPI {
     public void addOrUpdateCustomer(@RequestBody(required = false) CustomerDTO customerDTO){
         customerService.addOrUpdateCustomer(customerDTO);
     }
+    @GetMapping("{id}/transactionDetail")
+    public String loadTransactionDetail(@PathVariable Long id){
+        return transactionService.loadTransactionDetail(id);
+    }
     @GetMapping("/{id}/staffs")
     public ResponseDTO loadStaffs(@PathVariable Long id){
         ResponseDTO result = customerService.listStaffs(id);

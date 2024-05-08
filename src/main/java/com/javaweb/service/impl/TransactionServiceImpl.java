@@ -66,4 +66,10 @@ public Long addOrUpdateTransaction(TransactionDTO transactionDTO) {
         TransactionEntity transactionEntity = transactionRepository.findById(id).get();
         transactionRepository.delete(transactionEntity);
     }
+
+    @Override
+    public String loadTransactionDetail(Long id) {
+        TransactionEntity transactionEntity = transactionRepository.findById(id).get();
+        return transactionEntity.getNote();
+    }
 }

@@ -248,6 +248,7 @@
     }
     function updateTransaction(id){
         $('#transactionTypeModal').modal();
+        loadTransactionDetail(id);
         $('#id').val(id);
     }
     $('#btnAddUpdateTransaction').click(function(e){
@@ -262,6 +263,22 @@
             window.location.href="<c:url value="/admin/customer-edit?transactionDetail=required"/>"
         }
     });
+    function loadTransactionDetail(id){
+        $.ajax({
+            type: "GET",
+            url: "${customerAPI}/" + id + '/transactionDetail',
+            // data: JSON.stringify(data),
+            contentType: "application/json",
+            success: function(response){
+                var content = response;
+                document.getElementById("transactionDetail").value = content;
+            },
+            error: function(response){
+                console.log("failed");
+                window.location.href="<c:url value="/admin/building-list?message=error"/>"
+            }
+        });
+    }
     function addOrUpdateTransaction(data){
         $.ajax({
             type: "POST",

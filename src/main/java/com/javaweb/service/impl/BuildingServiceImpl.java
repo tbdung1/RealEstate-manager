@@ -120,16 +120,6 @@ public class BuildingServiceImpl implements BuildingService {
         }
         buildingEntity = buildingConverter.convertToEntity(buildingDTO);
         saveThumbnail(buildingDTO, buildingEntity);
-        List<RentAreaEntity> rentAreaEntities = new ArrayList<>();
-        String[] listRentArea = buildingDTO.getRentArea().split(",\\s*");
-        if(StringUtils.check(listRentArea[0])){
-            for(String it: listRentArea){
-                RentAreaEntity rentAreaEntity = new RentAreaEntity();
-                rentAreaEntity.setValue(Long.parseLong(it));
-                rentAreaEntities.add(rentAreaEntity);
-            }
-            buildingEntity.setRentAreaEntities(rentAreaEntities);
-        }
         buildingRepository.save(buildingEntity);
     }
 
