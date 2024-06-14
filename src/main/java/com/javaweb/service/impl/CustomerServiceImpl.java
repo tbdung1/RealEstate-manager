@@ -103,15 +103,7 @@ public class CustomerServiceImpl implements ICustomerService {
 
     @Override
     public void addOrUpdateCustomer(CustomerDTO customerDTO) {
-        CustomerEntity customerEntity = new CustomerEntity();
-        if(customerDTO.getId() != null){
-            customerEntity = customerRepository.findById(customerDTO.getId()).get();
-            customerDTO.setCreatedBy(customerEntity.getCreatedBy());
-            customerDTO.setCreatedDate(customerEntity.getCreatedDate());
-        }
-        List<UserEntity> userEntities = customerEntity.getUsers();
-        customerEntity = customerConverter.convertToEntity(customerDTO);
-        if(userEntities != null) customerEntity.setUsers(userEntities);
+        CustomerEntity customerEntity = customerConverter.convertToEntity(customerDTO);
         customerRepository.save(customerEntity);
     }
 }

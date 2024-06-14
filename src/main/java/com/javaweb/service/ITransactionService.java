@@ -9,7 +9,7 @@ import java.util.Map;
 
 public interface ITransactionService {
     public List<TransactionDTO> transactionTypeCustomer(String transactionType, Long customerid);
-    public Long addOrUpdateTransaction(TransactionDTO transactionDTO);
+    public void addOrUpdateTransaction(TransactionDTO transactionDTO);
     public void deleteTransaction(Long id);
     public String loadTransactionDetail(Long id);
 }

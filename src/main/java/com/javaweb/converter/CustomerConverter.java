@@ -33,11 +33,13 @@ public class CustomerConverter {
     }
     public CustomerEntity convertToEntity(CustomerDTO customerDTO) {
         CustomerEntity result = modelMapper.map(customerDTO, CustomerEntity.class);
-        List<TransactionEntity> transactionEntities = new ArrayList<>();
         if(customerDTO.getId() != null) {
-            transactionEntities = customerRepository.findById(customerDTO.getId()).get().getTransactionEntities();
+            CustomerEntity customerEntity = customerRepository.findById(customerDTO.getId()).get();
+            result.setTransactionEntities(customerEntity.getTransactionEntities());
+            result.setUsers(customerEntity.getUsers());
+            result.setCreatedBy(customerEntity.getCreatedBy());
+            result.setCreatedDate(customerEntity.getCreatedDate());
         }
-        result.setTransactionEntities(transactionEntities);
         result.setFullName(customerDTO.getName());
         result.setPhone(customerDTO.getCustomerPhone());
         result.setIs_active(true);

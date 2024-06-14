@@ -242,6 +242,7 @@
 
 <script>
     function transactionType(code, customerId){
+        document.getElementById("transactionDetail").value = '';
         $('#transactionTypeModal').modal();
         $('#customerId').val(customerId);
         $('#code').val(code);
@@ -283,22 +284,22 @@
         $.ajax({
             type: "POST",
             url: "${customerAPI}/" + "transaction",
-            dataType: "JSON",
             data: JSON.stringify(data),
             contentType: "application/json",
             success: function(response){
-                var url = '/admin/customer-edit-' + response + '?message=success';
+                var url = '/admin/customer-edit-' + data['customerId'] + '?message=success';
                 // Chuyển hướng trình duyệt đến URL mới
                 window.location.href = url;
             },
             error: function(response){
-                var url = '/admin/customer-edit-' + response + '?message=error';
+                var url = '/admin/customer-edit-' + data['customerId'] + '?message=error';
                 // Chuyển hướng trình duyệt đến URL mới
                 window.location.href = url;
             }
         });
     }
     $('#btnAddOrUpdateCustomer').click(function(){
+        e.preventDefault();
         var data = {};
         var formData = $('#listForm').serializeArray();
         $.each(formData, function(i, v){
@@ -334,6 +335,7 @@
         });
     }
     $('#btnCancel').click(function (){
+        e.preventDefault();
         window.location.href="/admin/customer-list"
     })
     function deleteTransaction(id){
@@ -344,11 +346,14 @@
             contentType: "application/json",
             success: function(response){
                 alert("Đã xóa giao dịch!");
-                <%--window.location.href="<c:url value="/admin/customer-?message=success"/>"--%>
+                var url = '/admin/customer-edit-' + id + '?message=success';
+                // Chuyển hướng trình duyệt đến URL mới
+                window.location.href = url;
             },
             error: function(response){
-                console.log("failed");
-                window.location.href="<c:url value="/admin/customer-list?message=error"/>"
+                var url = '/admin/customer-edit-' + id + '?message=error';
+                // Chuyển hướng trình duyệt đến URL mới
+                window.location.href = url;
             }
         });
     }

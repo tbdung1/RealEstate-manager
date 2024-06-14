@@ -47,7 +47,7 @@ public class TransactionServiceImpl implements ITransactionService {
         return transactionDTOList;
     }
 @Override
-public Long addOrUpdateTransaction(TransactionDTO transactionDTO) {
+public void addOrUpdateTransaction(TransactionDTO transactionDTO) {
     TransactionEntity transactionEntity = new TransactionEntity();
     List<TransactionEntity> transactionEntities = new ArrayList<>();
     if(transactionDTO.getId() != null){
@@ -58,7 +58,6 @@ public Long addOrUpdateTransaction(TransactionDTO transactionDTO) {
     }
     transactionEntity = transactionConverter.convertToEntity(transactionDTO);
     transactionRepository.save(transactionEntity);
-    return transactionEntity.getCustomerEntity().getId();
 }
 
     @Override

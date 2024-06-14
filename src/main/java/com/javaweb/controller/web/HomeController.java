@@ -18,13 +18,13 @@ import javax.servlet.http.HttpSession;
 @Controller(value = "homeControllerOfWeb")
 public class HomeController {
 
-	@RequestMapping(value = "/trang-chu", method = RequestMethod.GET)
-	public ModelAndView homePage(BuildingSearchRequest buildingSearchRequest, HttpServletRequest request) {
-		ModelAndView mav = new ModelAndView("web/home");
+    @RequestMapping(value = "/trang-chu", method = RequestMethod.GET)
+    public ModelAndView homePage(BuildingSearchRequest buildingSearchRequest, HttpServletRequest request) {
+        ModelAndView mav = new ModelAndView("web/home");
         mav.addObject("modelSearch", buildingSearchRequest);
         mav.addObject("districts", DistrictCode.type());
-		return mav;
-	}
+        return mav;
+    }
 
     @GetMapping(value="/gioi-thieu")
     public ModelAndView introducceBuiding(){
@@ -50,23 +50,23 @@ public class HomeController {
         return mav;
     }
 
-	@RequestMapping(value = "/login", method = RequestMethod.GET)
-	public ModelAndView login() {
-		ModelAndView mav = new ModelAndView("login");
-		return mav;
-	}
+    @RequestMapping(value = "/login", method = RequestMethod.GET)
+    public ModelAndView login() {
+        ModelAndView mav = new ModelAndView("login");
+        return mav;
+    }
 
-	@RequestMapping(value = "/access-denied", method = RequestMethod.GET)
-	public ModelAndView accessDenied() {
-		return new ModelAndView("redirect:/login?accessDenied");
-	}
+    @RequestMapping(value = "/access-denied", method = RequestMethod.GET)
+    public ModelAndView accessDenied() {
+        return new ModelAndView("redirect:/login?accessDenied");
+    }
 
-	@RequestMapping(value = "/logout", method = RequestMethod.GET)
-	public ModelAndView logout(HttpServletRequest request, HttpServletResponse response, HttpSession session) {
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		if (auth != null) {
-			new SecurityContextLogoutHandler().logout(request, response, auth);
-		}
-		return new ModelAndView("redirect:/trang-chu");
-	}
+    @RequestMapping(value = "/logout", method = RequestMethod.GET)
+    public ModelAndView logout(HttpServletRequest request, HttpServletResponse response, HttpSession session) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null) {
+            new SecurityContextLogoutHandler().logout(request, response, auth);
+        }
+        return new ModelAndView("redirect:/trang-chu");
+    }
 }
