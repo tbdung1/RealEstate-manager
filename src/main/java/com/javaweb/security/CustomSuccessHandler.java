@@ -38,7 +38,8 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 //            url = SystemConstant.ADMIN_HOME;
 //        }
 //        return url;
-        if (isUser(roles)) {
+        if (isUser(roles))
+        {
             url = SystemConstant.HOME;
         } else if (isAdmin(roles)) {
             url = SystemConstant.ADMIN_HOME;
